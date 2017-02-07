@@ -48,7 +48,7 @@ void getActualIronTemperature()
 
 void getActualSelectedTemperature()
 {
-  actualSetelectedTemp = analogRead(setTempPin); //TODO make conversion voltage to heat
+  actualSetelectedTemp = (0.195503 * analogRead(setTempPin)) + 200; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
 }
 
 void getActualInternalTemperature()
