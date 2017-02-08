@@ -10,7 +10,7 @@
 
 
 SevenSegment statusIndicator = SevenSegment(5,6,7,8,9,11,12);
-DualLed heatIdicator = DualLed(3,4);
+DualLed heatIndicator = DualLed(3,4);
 
 uint8_t heatPin = 2;           //discrete on/off heating
 uint8_t tempPin = 0;           //analog voltage of iron termocoupler
