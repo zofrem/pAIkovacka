@@ -10,7 +10,7 @@ typedef void (*sevenSegmentEventHandler)(SevenSegment&);
 class SevenSegment {
   public:
     SevenSegment(uint8_t segA, uint8_t segB, uint8_t segC, uint8_t segD, uint8_t segE, uint8_t segF, uint8_t segG);   
-    void showCharacter(uint8_t numberOfCharacter);
+    void showCharacter(uint8_t numberOfCharacter) const;
     
   private:  
     uint8_t mPinSegA;

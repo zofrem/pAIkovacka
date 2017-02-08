@@ -23,7 +23,7 @@ SevenSegment::SevenSegment(uint8_t segA, uint8_t segB, uint8_t segC, uint8_t seg
 /// showCharacter 
 /// show selected one character on seven segment display unit
 /////////////////////////////////////////////////////////
-void SevenSegment::showCharacter(uint8_t numberOfCharacter)
+void SevenSegment::showCharacter(uint8_t numberOfCharacter) const
 {
     if(numberOfCharacter >= 16) // cut unsupported chars
         numberOfCharacter = 0;
