@@ -18,7 +18,7 @@ uint8_t setTempPin = 1;        //analog voltage at preselected temperature on po
 uint8_t internalTempPin = 2;   //analog LM35 internal check for overheating
 int actualSetelectedTemp = 0;  //current temperature value of preselected temperature 
 int actualHeatTemp = 0;        //current temperature value at iron termocoupler
-int actualInternalTemp = 0;    //currebt temperature value inside soldering station
+int actualInternalTemp = 0;    //current temperature value inside soldering station
 
 void setup()
 {
@@ -30,13 +30,25 @@ void loop()
 {  
   getActualIronTemperature();
   getActualSelectedTemperature();
-  actualHeatTemp = analogRead(tempPin);
+  if(actualHeatTemp < actualSetelectedTemp)
+  {
+    heatIndicator.showBright(LED_RED);
+    digitalWrite(heatPin, true);
+  }
+  else
+  {
+    heatIndicator.showBright(LED_GREEN);
+    digitalWrite(heatPin, false);
+  }
   yield();
 }
 
 void dataOutput()
 {
+  Serial.print("Selected temperature:");
   Serial.println(actualSetelectedTemp);
+  Serial.print("Iron temperature:");
+  Serial.println(actualHeatTemp);
   Scheduler.delay(1000);
   yield(); 
 }
