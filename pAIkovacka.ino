@@ -19,6 +19,8 @@ uint8_t internalTempPin = 2;   //analog LM35 internal check for overheating
 int actualSetelectedTemp = 0;  //current temperature value of preselected temperature 
 int actualHeatTemp = 0;        //current temperature value at iron termocoupler
 int actualInternalTemp = 0;    //current temperature value inside soldering station
+const int tresholdTemp = 10;   //when heating temperature decrease by that value, heat will start again
+bool heatStatus = false;       //state of heating iron
 
 void setup()
 {
@@ -30,15 +32,22 @@ void loop()
 {  
   getActualIronTemperature();
   getActualSelectedTemperature();
-  if(actualHeatTemp < actualSetelectedTemp)
+  if(actualHeatTemp < actualSetelectedTemp - tresholdTemp)      //always heat until reach actualSetelectedTemp - tresholdTemp
   {
-    heatIndicator.showBright(LED_RED);
-    digitalWrite(heatPin, true);
+    heatIron(true);
   }
-  else
+  else if(actualHeatTemp < actualSetelectedTemp && heatStatus)  //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - tresholdTemp
   {
-    heatIndicator.showBright(LED_GREEN);
-    digitalWrite(heatPin, false);
+    heatIron(true);
+  }
+  else if(actualHeatTemp > actualSetelectedTemp + tresholdTemp) //error case for inexplicable iron overheat
+  {
+    //TODO log and sign error
+    heatIron(false);
+  }
+  else                                                          //selected temperature was reached stop heat
+  {
+    heatIron(false);
   }
   yield();
 }
@@ -49,8 +58,26 @@ void dataOutput()
   Serial.println(actualSetelectedTemp);
   Serial.print("Iron temperature:");
   Serial.println(actualHeatTemp);
+  heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
   Scheduler.delay(1000);
   yield(); 
+}
+
+void heatIron(bool onOff)
+{
+  if(heatStatus != onOff) //do only difference
+  {
+    heatStatus = onOff;
+    digitalWrite(heatPin, onOff);
+  }
+  if(onOff)
+  {
+    heatIndicator.showBright(LED_RED);
+  }
+  else
+  {
+    heatIndicator.showBright(LED_GREEN);
+  }
 }
 
 void getActualIronTemperature()
