@@ -12,15 +12,15 @@
 SevenSegment statusIndicator = SevenSegment(5,6,7,8,9,11,12);
 DualLed heatIndicator = DualLed(3,4);
 
-uint8_t heatPin = 2;           //discrete on/off heating
-uint8_t tempPin = 0;           //analog voltage of iron termocoupler
-uint8_t setTempPin = 1;        //analog voltage at preselected temperature on potentiometer
-uint8_t internalTempPin = 2;   //analog LM35 internal check for overheating
-int actualSetelectedTemp = 0;  //current temperature value of preselected temperature 
-int actualHeatTemp = 0;        //current temperature value at iron termocoupler
-int actualInternalTemp = 0;    //current temperature value inside soldering station
-const int tresholdTemp = 10;   //when heating temperature decrease by that value, heat will start again
-bool heatStatus = false;       //state of heating iron
+const uint8_t HEAT_PIN = 2;            //discrete on/off heating
+const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
+const uint8_t SET_TEMP_PIN = 1;        //analog voltage at preselected temperature on potentiometer
+const uint8_t INTERNAL_TEMP_PIN = 2;   //analog LM35 internal check for overheating
+int actualSetelectedTemp = 0;          //current temperature value of preselected temperature 
+int actualHeatTemp = 0;                //current temperature value at iron termocoupler
+int actualInternalTemp = 0;            //current temperature value inside soldering station
+const int THRESHOLD_TEMP = 10;         //when heating temperature decrease by that value, heat will start again
+bool heatStatus = false;               //state of heating iron
 
 void setup()
 {
@@ -32,20 +32,20 @@ void loop()
 {  
   getActualIronTemperature();
   getActualSelectedTemperature();
-  if(actualHeatTemp < actualSetelectedTemp - tresholdTemp)      //always heat until reach actualSetelectedTemp - tresholdTemp
+  if(actualHeatTemp < actualSetelectedTemp - THRESHOLD_TEMP)      //always heat until reach actualSetelectedTemp - THRESHOLD_TEMP
   {
     heatIron(true);
   }
-  else if(actualHeatTemp < actualSetelectedTemp && heatStatus)  //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - tresholdTemp
+  else if(actualHeatTemp < actualSetelectedTemp && heatStatus)    //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - THRESHOLD_TEMP
   {
     heatIron(true);
   }
-  else if(actualHeatTemp > actualSetelectedTemp + tresholdTemp) //error case for inexplicable iron overheat
+  else if(actualHeatTemp > actualSetelectedTemp + THRESHOLD_TEMP) //error case for inexplicable iron overheat
   {
     //TODO log and sign error
     heatIron(false);
   }
-  else                                                          //selected temperature was reached stop heat
+  else                                                            //selected temperature was reached stop heat
   {
     heatIron(false);
   }
@@ -68,7 +68,7 @@ void heatIron(bool onOff)
   if(heatStatus != onOff) //do only difference
   {
     heatStatus = onOff;
-    digitalWrite(heatPin, onOff);
+    digitalWrite(HEAT_PIN, onOff);
   }
   if(onOff)
   {
@@ -82,16 +82,16 @@ void heatIron(bool onOff)
 
 void getActualIronTemperature()
 {
-  actualHeatTemp = analogRead(tempPin); //TODO make conversion voltage to temperature
+  actualHeatTemp = analogRead(TEMP_PIN); //TODO make conversion voltage to temperature
 }
 
 void getActualSelectedTemperature()
 {
-  actualSetelectedTemp = (0.195503 * analogRead(setTempPin)) + 200; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  actualSetelectedTemp = (0.195503 * analogRead(SET_TEMP_PIN)) + 200; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
 }
 
 void getActualInternalTemperature()
 {
-  actualInternalTemp = (analogRead(internalTempPin) * 0.00488) * 100;
+  actualInternalTemp = (analogRead(INTERNAL_TEMP_PIN) * 0.00488) * 100;
 }
 
