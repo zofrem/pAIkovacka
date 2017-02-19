@@ -23,9 +23,10 @@ const int THRESHOLD_TEMP = 10;         //when heating temperature decrease by th
 bool heatStatus = false;               //state of heating iron
 
 void setup()
-{
+{ 
   Scheduler.startLoop(dataOutput);
-  Serial.begin(9600);  
+  Serial.begin(9600); 
+  pinMode(HEAT_PIN, OUTPUT);           //inicialization pin discrete heating for behavior like output
 }
 
 void loop() 
