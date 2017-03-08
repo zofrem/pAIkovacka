@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include "SevenSegment.h"
 #include "DualLed.h"
+#include "LoopRecorder.h"
 
 //pAIkovacka
 //artificial inteligence soldering station
@@ -11,6 +12,7 @@
 
 SevenSegment statusIndicator = SevenSegment(5,6,7,8,9,11,12);
 DualLed heatIndicator = DualLed(3,4);
+LoopRecorder<uint8_t>* statHeatTemp = new LoopRecorder<uint8_t>(256);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
