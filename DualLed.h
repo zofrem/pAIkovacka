@@ -21,6 +21,7 @@ class DualLed {
     void showBright(const LedStatuses ledBrightType);
     
   private:
+    DualLed(const DualLed& paste);
     void doBlink(const uint8_t currentPin, const unsigned int periode);
     uint8_t mPinRed;
     uint8_t mPinGreen;

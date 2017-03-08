@@ -10,8 +10,8 @@
 //rework of PCB for soldering sation ERS50 TESLA
 
 
-SevenSegment statusIndicator = SevenSegment(5,6,7,8,9,11,12);
-DualLed heatIndicator = DualLed(3,4);
+SevenSegment* statusIndicator = new SevenSegment(5,6,7,8,9,11,12);
+DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<uint8_t>* statHeatTemp = new LoopRecorder<uint8_t>(256);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
@@ -75,11 +75,11 @@ void heatIron(bool onOff)
   }
   if(onOff)
   {
-    heatIndicator.showBright(LED_RED);
+    heatIndicator->showBright(LED_RED);
   }
   else
   {
-    heatIndicator.showBright(LED_GREEN);
+    heatIndicator->showBright(LED_GREEN);
   }
 }
 
