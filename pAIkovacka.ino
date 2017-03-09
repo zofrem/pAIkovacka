@@ -14,6 +14,7 @@ const uint8_t AVERAGE_SAMPLES = 16;    //statistic count of samples for average
 SevenSegment* statusIndicator = new SevenSegment(5,6,7,8,9,11,12);
 DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
+LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -107,7 +108,8 @@ void getActualIronTemperature()
 
 void getActualSelectedTemperature()
 {
-  actualSetelectedTemp = (0.195503 * analogRead(SET_TEMP_PIN)) + 200; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  statSetTemp->pushBack((0.195503 * analogRead(SET_TEMP_PIN)) + 200); // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  actualSetelectedTemp = getAverageValue(*statSetTemp, AVERAGE_SAMPLES);
 }
 
 void getActualInternalTemperature()
