@@ -9,10 +9,11 @@
 //artificial inteligence soldering station
 //rework of PCB for soldering sation ERS50 TESLA
 
+const uint8_t AVERAGE_SAMPLES = 16;    //statistic count of samples for average
 
 SevenSegment* statusIndicator = new SevenSegment(5,6,7,8,9,11,12);
 DualLed* heatIndicator = new DualLed(3,4);
-LoopRecorder<uint8_t>* statHeatTemp = new LoopRecorder<uint8_t>(256);
+LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -83,9 +84,25 @@ void heatIron(bool onOff)
   }
 }
 
+int getAverageValue(const LoopRecorder<int>& data, const uint8_t samplesCount)
+{
+  int value = 0;
+  uint8_t empty = 0;
+  int sumOfValues = 0;
+  for(uint8_t i = 0; i < samplesCount; ++i)
+  {
+    if(data.getLastSample(i, value))
+      sumOfValues += value;
+    else
+      ++empty;
+  }
+  return sumOfValues / (samplesCount - empty);
+}
+
 void getActualIronTemperature()
 {
-  actualHeatTemp = analogRead(TEMP_PIN); //TODO make conversion voltage to temperature
+  statHeatTemp->pushBack(analogRead(TEMP_PIN)); //TODO make conversion voltage to temperature
+  actualHeatTemp = getAverageValue(*statHeatTemp, AVERAGE_SAMPLES);
 }
 
 void getActualSelectedTemperature()
@@ -97,4 +114,3 @@ void getActualInternalTemperature()
 {
   actualInternalTemp = (analogRead(INTERNAL_TEMP_PIN) * 0.00488) * 100;
 }
-
