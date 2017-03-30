@@ -26,9 +26,19 @@ int actualInternalTemp = 0;            //current temperature value inside solder
 const int THRESHOLD_TEMP = 10;         //when heating temperature decrease by that value, heat will start again
 bool heatStatus = false;               //state of heating iron
 
+enum HeatStatus
+{
+  HEAT_OFF,
+  HEAT_STARTUP,
+  HEAT_CONTINUE,
+  HEAT_WAIT,
+  HEAT_OVERHEAT = 14
+};
+
 void setup()
 { 
   Scheduler.startLoop(dataOutput);
+  statusIndicator->showCharacter(HEAT_OFF);
   Serial.begin(9600); 
   pinMode(HEAT_PIN, OUTPUT);           //inicialization pin discrete heating for behavior like output
 }
@@ -39,19 +49,22 @@ void loop()
   getActualSelectedTemperature();
   if(actualHeatTemp < actualSetelectedTemp - THRESHOLD_TEMP)      //always heat until reach actualSetelectedTemp - THRESHOLD_TEMP
   {
+    statusIndicator->showCharacter(HEAT_STARTUP);
     heatIron(true);
   }
   else if(actualHeatTemp < actualSetelectedTemp && heatStatus)    //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - THRESHOLD_TEMP
   {
+    statusIndicator->showCharacter(HEAT_CONTINUE);
     heatIron(true);
   }
   else if(actualHeatTemp > actualSetelectedTemp + THRESHOLD_TEMP) //error case for inexplicable iron overheat
   {
-    //TODO log and sign error
+    statusIndicator->showCharacter(HEAT_OVERHEAT);
     heatIron(false);
   }
   else                                                            //selected temperature was reached stop heat
   {
+    statusIndicator->showCharacter(HEAT_WAIT);
     heatIron(false);
   }
   yield();
