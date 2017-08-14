@@ -1,9 +1,9 @@
-#include <SchedulerARMAVR.h>
 #include <SoftwareSerial.h>
 #include <inttypes.h>
-#include "SevenSegment.h"
+#include <max6675.h>
 #include "DualLed.h"
 #include "LoopRecorder.h"
+#include "LoopTimer.h"
 
 //pAIkovacka
 //artificial inteligence soldering station
@@ -11,10 +11,11 @@
 
 const uint8_t AVERAGE_SAMPLES = 16;    //statistic count of samples for average
 
-SevenSegment* statusIndicator = new SevenSegment(5,6,7,8,9,11,12);
+MAX6675 thermocouple(5, 6, 7);
 DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
+LoopTimer* serialResponse = new LoopTimer(1000);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -37,8 +38,6 @@ enum HeatStatus
 
 void setup()
 { 
-  Scheduler.startLoop(dataOutput);
-  statusIndicator->showCharacter(HEAT_OFF);
   Serial.begin(9600); 
   pinMode(HEAT_PIN, OUTPUT);           //inicialization pin discrete heating for behavior like output
 }
@@ -49,25 +48,22 @@ void loop()
   getActualSelectedTemperature();
   if(actualHeatTemp < actualSetelectedTemp - THRESHOLD_TEMP)      //always heat until reach actualSetelectedTemp - THRESHOLD_TEMP
   {
-    statusIndicator->showCharacter(HEAT_STARTUP);
     heatIron(true);
   }
   else if(actualHeatTemp < actualSetelectedTemp && heatStatus)    //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - THRESHOLD_TEMP
   {
-    statusIndicator->showCharacter(HEAT_CONTINUE);
     heatIron(true);
   }
   else if(actualHeatTemp > actualSetelectedTemp + THRESHOLD_TEMP) //error case for inexplicable iron overheat
   {
-    statusIndicator->showCharacter(HEAT_OVERHEAT);
     heatIron(false);
   }
   else                                                            //selected temperature was reached stop heat
   {
-    statusIndicator->showCharacter(HEAT_WAIT);
     heatIron(false);
   }
-  yield();
+  if(serialResponse->timer())
+    dataOutput();
 }
 
 void dataOutput()
@@ -77,8 +73,6 @@ void dataOutput()
   Serial.print("Iron temperature:");
   Serial.println(actualHeatTemp);
   heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
-  Scheduler.delay(1000);
-  yield(); 
 }
 
 void heatIron(bool onOff)
@@ -115,8 +109,9 @@ int getAverageValue(const LoopRecorder<int>& data, const uint8_t samplesCount)
 
 void getActualIronTemperature()
 {
-  statHeatTemp->pushBack(analogRead(TEMP_PIN)); //TODO make conversion voltage to temperature
-  actualHeatTemp = getAverageValue(*statHeatTemp, AVERAGE_SAMPLES);
+  int temp = thermocouple.readCelsius();
+  statHeatTemp->pushBack(temp); //TODO make conversion voltage to temperature
+  actualHeatTemp = temp;
 }
 
 void getActualSelectedTemperature()
