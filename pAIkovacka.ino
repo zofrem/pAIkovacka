@@ -11,7 +11,7 @@
 
 const uint8_t AVERAGE_SAMPLES = 16;    //statistic count of samples for average
 
-MAX6675 thermocouple(5, 6, 7);
+MAX6675* thermocouple =  new MAX6675(5, 6, 7);
 DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
@@ -109,7 +109,7 @@ int getAverageValue(const LoopRecorder<int>& data, const uint8_t samplesCount)
 
 void getActualIronTemperature()
 {
-  int temp = thermocouple.readCelsius();
+  int temp = thermocouple->readCelsius();
   statHeatTemp->pushBack(temp); //TODO make conversion voltage to temperature
   actualHeatTemp = temp;
 }
