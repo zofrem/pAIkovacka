@@ -27,7 +27,8 @@ class DualLed {
     uint8_t mPinGreen;
     LedStatuses mCurrentBrightStatus;
     bool mBlinkLastStatus;
-    unsigned long mBlinkLastTime;    
+    unsigned long mBlinkLastTime;
+    LedStatuses mActiveBrightType;
 };
 
 #endif

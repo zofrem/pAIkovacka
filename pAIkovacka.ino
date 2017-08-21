@@ -48,18 +48,22 @@ void loop()
   getActualSelectedTemperature();
   if(actualHeatTemp < actualSetelectedTemp - THRESHOLD_TEMP)      //always heat until reach actualSetelectedTemp - THRESHOLD_TEMP
   {
+    heatIndicator->showBright(LED_RED);
     heatIron(true);
   }
   else if(actualHeatTemp < actualSetelectedTemp && heatStatus)    //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - THRESHOLD_TEMP
   {
+    heatIndicator->showBright(LED_RED);
     heatIron(true);
   }
   else if(actualHeatTemp > actualSetelectedTemp + THRESHOLD_TEMP) //error case for inexplicable iron overheat
   {
+    heatIndicator->showBright(LED_RED_BLINK);
     heatIron(false);
   }
   else                                                            //selected temperature was reached stop heat
   {
+    heatIndicator->showBright(LED_GREEN);
     heatIron(false);
   }
   if(serialResponse->timer())
@@ -81,14 +85,6 @@ void heatIron(bool onOff)
   {
     heatStatus = onOff;
     digitalWrite(HEAT_PIN, onOff);
-  }
-  if(onOff)
-  {
-    heatIndicator->showBright(LED_RED);
-  }
-  else
-  {
-    heatIndicator->showBright(LED_GREEN);
   }
 }
 

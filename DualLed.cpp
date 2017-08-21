@@ -11,6 +11,7 @@ DualLed::DualLed(const uint8_t red, const uint8_t green)
     mPinGreen = green;
     mBlinkLastStatus = false;
     mBlinkLastTime = millis();
+    mActiveBrightType = LED_OFF;
 }
 
 void DualLed::showBright(const LedStatuses ledBrightType)
@@ -18,16 +19,25 @@ void DualLed::showBright(const LedStatuses ledBrightType)
   switch(ledBrightType)
   {
     case LED_OFF:
-      digitalWrite(mPinRed, false);
-      digitalWrite(mPinGreen, false);
+      if(ledBrightType != mActiveBrightType)
+      {
+        digitalWrite(mPinRed, false);
+        digitalWrite(mPinGreen, false);
+      }
       break;
     case LED_RED:
-      digitalWrite(mPinRed, true);
-      digitalWrite(mPinGreen, false);
+      if(ledBrightType != mActiveBrightType)
+      {
+        digitalWrite(mPinRed, true);
+        digitalWrite(mPinGreen, false);
+      }
       break;
     case LED_GREEN:
-      digitalWrite(mPinRed, false);
-      digitalWrite(mPinGreen, true);
+      if(ledBrightType != mActiveBrightType)
+      {
+        digitalWrite(mPinRed, false);
+        digitalWrite(mPinGreen, true);
+      }
       break;
     case LED_GREEN_BLINK:
       digitalWrite(mPinRed, false);
