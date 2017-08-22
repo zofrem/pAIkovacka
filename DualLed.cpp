@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "DualLed.h"
-//#include <SchedulerARMAVR.h>
 
 
 DualLed::DualLed(const uint8_t red, const uint8_t green)

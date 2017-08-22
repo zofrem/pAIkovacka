@@ -4,6 +4,7 @@
 #include "DualLed.h"
 #include "LoopRecorder.h"
 #include "LoopTimer.h"
+#include "StopWatch.h"
 
 //pAIkovacka
 //artificial inteligence soldering station
@@ -16,6 +17,7 @@ DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopTimer* serialResponse = new LoopTimer(1000);
+StopWatch* heaterStopWatch = new StopWatch();
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -77,6 +79,10 @@ void dataOutput()
   Serial.print("Iron temperature:");
   Serial.println(actualHeatTemp);
   heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
+  uint32_t time = 0;
+  bool run = heaterStopWatch->getActualWatch(time);
+  run ? Serial.println("TimerRun") : Serial.println("TimerStop");
+  Serial.println(time);
 }
 
 void heatIron(bool onOff)
@@ -85,6 +91,7 @@ void heatIron(bool onOff)
   {
     heatStatus = onOff;
     digitalWrite(HEAT_PIN, onOff);
+    countTimeOfHeat(onOff);
   }
 }
 
@@ -119,4 +126,13 @@ void getActualSelectedTemperature()
 void getActualInternalTemperature()
 {
   actualInternalTemp = (analogRead(INTERNAL_TEMP_PIN) * 0.00488) * 100;
+}
+
+void countTimeOfHeat(bool onOffHeat)
+{
+  //TODO current implementation test purposes only
+  if(onOffHeat)
+    heaterStopWatch->startWatch();
+  else
+    heaterStopWatch->stopWatch();
 }
