@@ -7,27 +7,34 @@ StopWatch::StopWatch()
   mWatchRunning = false;
 }
 
-void StopWatch::startWatch()
+bool StopWatch::startWatch()
 {
+  if(mWatchRunning)
+    return false;
   mWatchRunning = true;
   mStartTime = millis();
+  return true;
 }
 
-uint32_t StopWatch::stopWatch()
+bool StopWatch::stopWatch(uint32_t& time)
 {
   if(!mWatchRunning)
-    return 0;
+  {
+    time = 0;
+    return false;
+  }
   mFirstRun = false;
   mWatchRunning = false;
-  watchDifference(mFinishTime);
-  return mFinishTime;
+  getLapTime(mFinishTime);
+  time = mFinishTime;
+  return true;
 }
 
 bool StopWatch::getActualWatch(uint32_t& time)
 {
   if(mWatchRunning)
   {
-    watchDifference(time);
+    getLapTime(time);
     return true;    
   }
   else
@@ -45,7 +52,7 @@ bool StopWatch::getActualWatch(uint32_t& time)
   }
 }
 
-void StopWatch::watchDifference(uint32_t& time)
+void StopWatch::getLapTime(uint32_t& time)
 {
   time = millis() - mStartTime;  
 }

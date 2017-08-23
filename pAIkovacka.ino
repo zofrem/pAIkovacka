@@ -131,8 +131,9 @@ void getActualInternalTemperature()
 void countTimeOfHeat(bool onOffHeat)
 {
   //TODO current implementation test purposes only
+  uint32_t time;
   if(onOffHeat)
     heaterStopWatch->startWatch();
   else
-    heaterStopWatch->stopWatch();
+    heaterStopWatch->stopWatch(time);
 }
