@@ -4,7 +4,7 @@
 #include "DualLed.h"
 #include "LoopRecorder.h"
 #include "LoopTimer.h"
-#include "StopWatch.h"
+#include "PowerModes.h"
 
 //pAIkovacka
 //artificial inteligence soldering station
@@ -17,12 +17,11 @@ DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopTimer* serialResponse = new LoopTimer(1000);
-StopWatch* heaterStopWatch = new StopWatch();
+PowerModes* powerModes = new PowerModes();
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
 const uint8_t SET_TEMP_PIN = 1;        //analog voltage at preselected temperature on potentiometer
-const uint8_t INTERNAL_TEMP_PIN = 2;   //analog LM35 internal check for overheating
 int actualSetelectedTemp = 0;          //current temperature value of preselected temperature 
 int actualHeatTemp = 0;                //current temperature value at iron termocoupler
 int actualInternalTemp = 0;            //current temperature value inside soldering station
@@ -80,7 +79,7 @@ void dataOutput()
   Serial.println(actualHeatTemp);
   heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
   uint32_t time = 0;
-  bool run = heaterStopWatch->getActualWatch(time);
+  bool run = powerModes->heatTime(time);
   run ? Serial.println("TimerRun") : Serial.println("TimerStop");
   Serial.println(time);
 }
@@ -91,7 +90,7 @@ void heatIron(bool onOff)
   {
     heatStatus = onOff;
     digitalWrite(HEAT_PIN, onOff);
-    countTimeOfHeat(onOff);
+    powerModes->bookHeating(onOff);
   }
 }
 
@@ -119,21 +118,6 @@ void getActualIronTemperature()
 
 void getActualSelectedTemperature()
 {
-  statSetTemp->pushBack((0.195503 * analogRead(SET_TEMP_PIN)) + 200); // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  statSetTemp->pushBack((0.195503 * analogRead(SET_TEMP_PIN)) + 0); // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
   actualSetelectedTemp = getAverageValue(*statSetTemp, AVERAGE_SAMPLES);
-}
-
-void getActualInternalTemperature()
-{
-  actualInternalTemp = (analogRead(INTERNAL_TEMP_PIN) * 0.00488) * 100;
-}
-
-void countTimeOfHeat(bool onOffHeat)
-{
-  //TODO current implementation test purposes only
-  uint32_t time;
-  if(onOffHeat)
-    heaterStopWatch->startWatch();
-  else
-    heaterStopWatch->stopWatch(time);
 }
