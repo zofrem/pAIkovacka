@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include "PowerModes.h"
 #include "StopWatch.h"
+#include "LoopTimer.h"
 
 PowerModes::PowerModes()
 {
   mHeaterStopWatch = new StopWatch();
+  heatTimes = new LoopRecorder<uint8_t>(TIME_SAMPLES);
 }
 
 PowerModes::~PowerModes()

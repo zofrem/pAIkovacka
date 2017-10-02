@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include "StopWatch.h"
+#include "LoopRecorder.h"
 
 /////////////////////////////////////////////////////////
 /// PowerModes
@@ -10,16 +11,19 @@
 /////////////////////////////////////////////////////////
 
 class PowerModes {
-  public:
-    PowerModes();
-    ~PowerModes();
-    void bookHeating(bool onOffHeat);
-    bool heatTime(uint32_t& time);
+public:
+  PowerModes();
+  ~PowerModes();
+  void bookHeating(bool onOffHeat);
+  bool heatTime(uint32_t& time);
 
-  private:
-    PowerModes(const PowerModes& powerModes);
-    StopWatch* mHeaterStopWatch;
+private:
+  PowerModes(const PowerModes& powerModes);
+  StopWatch* mHeaterStopWatch;
+  LoopRecorder<uint8_t>* heatTimes;
+  static const uint8_t TIME_SAMPLES = 16;
 
 };
 
 #endif
+
