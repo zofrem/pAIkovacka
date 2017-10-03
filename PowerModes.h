@@ -15,7 +15,7 @@ public:
   PowerModes();
   ~PowerModes();
   void bookHeating(bool onOffHeat);
-  bool heatTime(uint32_t& time);
+  bool heatTime(uint8_t& time);
 
 private:
   PowerModes(const PowerModes& powerModes);
