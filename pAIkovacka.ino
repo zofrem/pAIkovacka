@@ -79,7 +79,7 @@ void dataOutput()
   Serial.println(actualHeatTemp);
   heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
   uint8_t time = 0;
-  bool run = powerModes->heatTime(time);
+  bool run = powerModes->coolingTime(time);
   run ? Serial.println("TimerRun") : Serial.println("TimerStop");
   Serial.println(time);
 }

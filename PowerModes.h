@@ -15,12 +15,12 @@ public:
   PowerModes();
   ~PowerModes();
   void bookHeating(bool onOffHeat);
-  bool heatTime(uint8_t& time);
+  bool coolingTime(uint8_t& time);
 
 private:
   PowerModes(const PowerModes& powerModes);
   StopWatch* mHeaterStopWatch;
-  LoopRecorder<uint8_t>* heatTimes;
+  LoopRecorder<uint8_t>* mCoolingTimes;
   static const uint8_t TIME_SAMPLES = 16;
 
 };
