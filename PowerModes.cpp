@@ -6,7 +6,8 @@
 PowerModes::PowerModes()
 {
   mHeaterStopWatch = new StopWatch();
-  mCoolingTimes = new LoopRecorder<uint8_t>(TIME_SAMPLES);
+  mCoolingDiffTimes = new LoopRecorder<int8_t>(TIME_SAMPLES);
+  mFirstRun = true;
 }
 
 PowerModes::~PowerModes()
@@ -24,17 +25,29 @@ void PowerModes::bookHeating(bool onOffHeat)
     {
       uint32_t time;
       if(mHeaterStopWatch->stopWatch(time))
-      {
-        time = time / 1000; //ms to sec
-        if(time > 255)
-          time = 255;
-        mCoolingTimes->pushBack(static_cast<uint8_t>(time));
-      }
+        storeCoolingTimeDifference(time);
     }
 }
 
-bool PowerModes::coolingTime(uint8_t& time)
+bool PowerModes::coolingTime(int8_t& time)
 {
   //return mHeaterStopWatch->getActualWatch(time);
-  return mCoolingTimes->getLastSample(0, time);
+  return mCoolingDiffTimes->getLastSample(0, time);
+}
+
+void PowerModes::storeCoolingTimeDifference(uint32_t& time)
+{
+  if(!mFirstRun)
+  {
+    int32_t diffTime = time - mLastCoolingTime;
+    diffTime = diffTime / 1000; //ms to sec
+    if(diffTime > 127)
+      diffTime = 127;
+    else if(diffTime < -127)
+      diffTime = -127;
+    mCoolingDiffTimes->pushBack(static_cast<int8_t>(diffTime));
+  }
+  else
+    mFirstRun = false;
+  mLastCoolingTime = time;
 }

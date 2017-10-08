@@ -78,7 +78,7 @@ void dataOutput()
   Serial.print("Iron temperature:");
   Serial.println(actualHeatTemp);
   heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
-  uint8_t time = 0;
+  int8_t time = 0;
   bool run = powerModes->coolingTime(time);
   run ? Serial.println("TimerRun") : Serial.println("TimerStop");
   Serial.println(time);
