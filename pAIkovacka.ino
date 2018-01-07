@@ -17,6 +17,7 @@ DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopTimer* serialResponse = new LoopTimer(1000);
+LoopTimer* max6675Response = new LoopTimer(225);
 PowerModes* powerModes = new PowerModes();
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
@@ -45,8 +46,12 @@ void setup()
 
 void loop() 
 {  
-  getActualIronTemperature();
-  getActualSelectedTemperature();
+  if(max6675Response->timer())
+  {
+    getActualIronTemperature();
+    getActualSelectedTemperature();
+  }
+
   if(actualHeatTemp < actualSetelectedTemp - THRESHOLD_TEMP)      //always heat until reach actualSetelectedTemp - THRESHOLD_TEMP
   {
     heatIndicator->showBright(LED_RED);
@@ -111,13 +116,13 @@ int getAverageValue(const LoopRecorder<int>& data, const uint8_t samplesCount)
 
 void getActualIronTemperature()
 {
-  int temp = thermocouple->readCelsius();
+  int temp = thermocouple->readCelsius() - 250;
   statHeatTemp->pushBack(temp); //TODO make conversion voltage to temperature
   actualHeatTemp = temp;
 }
 
 void getActualSelectedTemperature()
 {
-  statSetTemp->pushBack((0.195503 * analogRead(SET_TEMP_PIN)) + 0); // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  statSetTemp->pushBack((0.195503 * analogRead(SET_TEMP_PIN)) + 200); // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
   actualSetelectedTemp = getAverageValue(*statSetTemp, AVERAGE_SAMPLES);
 }
