@@ -26,8 +26,7 @@ const uint8_t SET_TEMP_PIN = 1;        //analog voltage at preselected temperatu
 int actualSetelectedTemp = 0;          //current temperature value of preselected temperature 
 int actualHeatTemp = 0;                //current temperature value at iron termocoupler
 int actualInternalTemp = 0;            //current temperature value inside soldering station
-const int THRESHOLD_TEMP = 10;         //when heating temperature decrease by that value, heat will start again
-bool heatStatus = false;               //state of heating iron
+const int THRESHOLD_TEMP = 15;         //when heating temperature decrease by that value, heat will start again
 
 enum HeatStatus
 {
@@ -41,7 +40,6 @@ enum HeatStatus
 void setup()
 { 
   Serial.begin(9600); 
-  pinMode(HEAT_PIN, OUTPUT);           //inicialization pin discrete heating for behavior like output
 }
 
 void loop() 
@@ -52,26 +50,6 @@ void loop()
     getActualSelectedTemperature();
   }
 
-  if(actualHeatTemp < actualSetelectedTemp - THRESHOLD_TEMP)      //always heat until reach actualSetelectedTemp - THRESHOLD_TEMP
-  {
-    heatIndicator->showBright(LED_RED);
-    heatIron(true);
-  }
-  else if(actualHeatTemp < actualSetelectedTemp && heatStatus)    //continue heat when temperature rise, othewise cool down to actualSetelectedTemp - THRESHOLD_TEMP
-  {
-    heatIndicator->showBright(LED_RED);
-    heatIron(true);
-  }
-  else if(actualHeatTemp > actualSetelectedTemp + THRESHOLD_TEMP) //error case for inexplicable iron overheat
-  {
-    heatIndicator->showBright(LED_RED_BLINK);
-    heatIron(false);
-  }
-  else                                                            //selected temperature was reached stop heat
-  {
-    heatIndicator->showBright(LED_GREEN);
-    heatIron(false);
-  }
   if(serialResponse->timer())
     dataOutput();
 }
@@ -82,22 +60,14 @@ void dataOutput()
   Serial.println(actualSetelectedTemp);
   Serial.print("Iron temperature:");
   Serial.println(actualHeatTemp);
-  heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
+  //heatStatus ? Serial.println("Heating") : Serial.println("Cooling");
   int8_t time = 0;
   bool run = powerModes->coolingTime(time);
   run ? Serial.println("TimerRun") : Serial.println("TimerStop");
   Serial.println(time);
 }
 
-void heatIron(bool onOff)
-{
-  if(heatStatus != onOff) //do only difference
-  {
-    heatStatus = onOff;
-    digitalWrite(HEAT_PIN, onOff);
-    powerModes->bookHeating(onOff);
-  }
-}
+
 
 int getAverageValue(const LoopRecorder<int>& data, const uint8_t samplesCount)
 {
@@ -116,7 +86,7 @@ int getAverageValue(const LoopRecorder<int>& data, const uint8_t samplesCount)
 
 void getActualIronTemperature()
 {
-  int temp = thermocouple->readCelsius() - 250;
+  int temp = thermocouple->readCelsius() - 300;
   statHeatTemp->pushBack(temp); //TODO make conversion voltage to temperature
   actualHeatTemp = temp;
 }

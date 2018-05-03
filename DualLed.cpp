@@ -40,11 +40,11 @@ void DualLed::showBright(const LedStatuses ledBrightType)
       break;
     case LED_GREEN_BLINK:
       digitalWrite(mPinRed, false);
-      doBlink(mPinGreen, 250);
+      doBlink(mPinGreen, 100);
       break;
     case LED_RED_BLINK:
       digitalWrite(mPinGreen, false);
-      doBlink(mPinRed, 250);
+      doBlink(mPinRed, 100);
       break;
   }
 }
