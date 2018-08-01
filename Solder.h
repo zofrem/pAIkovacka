@@ -2,7 +2,6 @@
 #define SOLDER_H
 
 #include <inttypes.h>
-#include "DualLed.h"
 #include "LoopTimer.h"
 
 /////////////////////////////////////////////////////////
@@ -15,18 +14,19 @@ class Solder {
     Solder(const uint8_t heatPin, const uint32_t time) : mHeatPin(heatPin), mTime(time)
     {
         pinMode(mHeatPin, OUTPUT);           //inicialization pin discrete heating for behavior like output
-        mHeaterTimer = new LoopTimer(mTime);
+        mPwmTimer = new LoopTimer(mTime);
         mCyclus = 0;
         mHeatStatus = false;
         
     }; 
-    void lowFreqPwm(const unsigned int level, DualLed& dualLed);
+    void lowFreqPwm(const unsigned int level);
+    bool isHeating() const;
 
   
   private:
     Solder(const Solder& notPaste);
     void heatIron(const bool onOff);
-    LoopTimer* mHeaterTimer;
+    LoopTimer* mPwmTimer;
     uint8_t mCyclus;
     uint8_t mHeatPin;
     uint32_t mTime;

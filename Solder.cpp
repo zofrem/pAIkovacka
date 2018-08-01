@@ -11,18 +11,24 @@ void Solder::heatIron(const bool onOff)
   }
 }
 
-void Solder::lowFreqPwm(const unsigned int level, DualLed& dualLed)
+void Solder::lowFreqPwm(const unsigned int level)
 {
-  ++mCyclus;
-  if(level < mCyclus)
+  if(mPwmTimer->timer())
   {
-    dualLed->showBright(LED_RED);
-    heatIron(true);
+    ++mCyclus;
+    if(mCyclus < level)
+    {
+      heatIron(true);
+    }
+    else
+    {
+      heatIron(false);
+    }
   }
-  else
-  {
-    dualLed->showBright(LED_GREEN);
-    heatIron(false);  
-  }
+}
+
+bool Solder::isHeating() const
+{
+  return mHeatStatus;
 }
 

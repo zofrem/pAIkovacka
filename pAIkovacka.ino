@@ -5,6 +5,7 @@
 #include "LoopRecorder.h"
 #include "LoopTimer.h"
 #include "PowerModes.h"
+#include "Solder.h"
 
 //pAIkovacka
 //artificial inteligence soldering station
@@ -13,12 +14,13 @@
 const uint8_t AVERAGE_SAMPLES = 16;    //statistic count of samples for average
 
 MAX6675* thermocouple =  new MAX6675(5, 6, 7);
-DualLed* heatIndicator = new DualLed(3,4);
+//DualLed* heatIndicator = new DualLed(13,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopTimer* serialResponse = new LoopTimer(1000);
 LoopTimer* max6675Response = new LoopTimer(225);
 PowerModes* powerModes = new PowerModes();
+Solder* solder = new Solder(3, 200);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -43,12 +45,14 @@ void setup()
 }
 
 void loop() 
-{  
+{
+solder->lowFreqPwm(250);
   if(max6675Response->timer())
   {
     getActualIronTemperature();
     getActualSelectedTemperature();
   }
+
 
   if(serialResponse->timer())
     dataOutput();
