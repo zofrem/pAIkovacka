@@ -20,7 +20,7 @@ LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopTimer* serialResponse = new LoopTimer(1000);
 LoopTimer* max6675Response = new LoopTimer(225);
 PowerModes* powerModes = new PowerModes();
-Solder* solder = new Solder(3, 200);
+Solder* solder = new Solder(3, 20, 35);
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -46,7 +46,8 @@ void setup()
 
 void loop() 
 {
-solder->lowFreqPwm(250);
+  solder->lowFreqPwm(1);
+  
   if(max6675Response->timer())
   {
     getActualIronTemperature();

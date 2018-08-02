@@ -11,7 +11,7 @@
 
 class Solder {
   public:
-    Solder(const uint8_t heatPin, const uint32_t time) : mHeatPin(heatPin), mTime(time)
+    Solder(const uint8_t heatPin, const uint32_t time, const uint8_t lowPowerLevel) : mHeatPin(heatPin), mTime(time), mLowPowerLevel(lowPowerLevel) 
     {
         pinMode(mHeatPin, OUTPUT);           //inicialization pin discrete heating for behavior like output
         mPwmTimer = new LoopTimer(mTime);
@@ -26,9 +26,11 @@ class Solder {
   private:
     Solder(const Solder& notPaste);
     void heatIron(const bool onOff);
+    uint8_t getLevelFromPercentage(const uint8_t percentage) const;
     LoopTimer* mPwmTimer;
     uint8_t mCyclus;
-    uint8_t mHeatPin;
+    const uint8_t mHeatPin;
+    const uint8_t mLowPowerLevel;
     uint32_t mTime;
     bool mHeatStatus;               //state of heating iron
 
