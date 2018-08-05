@@ -19,7 +19,7 @@ class Solder {
         mHeatStatus = false;
         
     }; 
-    void lowFreqPwm(const unsigned int level);
+    bool lowFreqPwm(const unsigned int level);
     bool isHeating() const;
 
   

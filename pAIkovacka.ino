@@ -18,7 +18,7 @@ MAX6675* thermocouple =  new MAX6675(5, 6, 7);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopTimer* serialResponse = new LoopTimer(1000);
-LoopTimer* max6675Response = new LoopTimer(225);
+//max6675Response is 225ms take care
 PowerModes* powerModes = new PowerModes();
 Solder* solder = new Solder(3, 20, 35);
 
@@ -46,9 +46,8 @@ void setup()
 
 void loop() 
 {
-  solder->lowFreqPwm(1);
-  
-  if(max6675Response->timer())
+  uint8_t power = 25;
+  if(solder->lowFreqPwm(power)) //TODO check response of MAX 225ms but you call 20ms before 
   {
     getActualIronTemperature();
     getActualSelectedTemperature();

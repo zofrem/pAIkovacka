@@ -11,7 +11,7 @@ void Solder::heatIron(const bool onOff)
   }
 }
 
-void Solder::lowFreqPwm(const unsigned int level)
+bool Solder::lowFreqPwm(const unsigned int level)
 {        
   if(mPwmTimer->timer())
   {
@@ -19,10 +19,17 @@ void Solder::lowFreqPwm(const unsigned int level)
     if(mCyclus < getLevelFromPercentage(level))
     {
       heatIron(true);
+      return false;
+    }
+    else if(0xFF == mCyclus) // last moment before heating numeric_limits<uint8_t>::max() not for 8bit
+    {
+      heatIron(false);
+      return true; //now measure temperature
     }
     else
     {
       heatIron(false);
+      return false;
     }
   }
 }
