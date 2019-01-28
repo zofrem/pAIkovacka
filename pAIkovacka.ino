@@ -14,13 +14,13 @@
 const uint8_t AVERAGE_SAMPLES = 16;    //statistic count of samples for average
 
 MAX6675* thermocouple =  new MAX6675(5, 6, 7);
-//DualLed* heatIndicator = new DualLed(13,4);
+DualLed* heatIndicator = new DualLed(3,4);
 LoopRecorder<int>* statHeatTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
 LoopRecorder<int>* statSetTemp = new LoopRecorder<int>(AVERAGE_SAMPLES);
-LoopTimer* serialResponse = new LoopTimer(1000);
+LoopTimer* serialResponse = new LoopTimer(250);
 //max6675Response is 225ms take care
 PowerModes* powerModes = new PowerModes();
-Solder* solder = new Solder(3, 20, 35);
+
 
 const uint8_t HEAT_PIN = 2;            //discrete on/off heating
 const uint8_t TEMP_PIN = 0;            //analog voltage of iron termocoupler
@@ -29,6 +29,8 @@ int actualSetelectedTemp = 0;          //current temperature value of preselecte
 int actualHeatTemp = 0;                //current temperature value at iron termocoupler
 int actualInternalTemp = 0;            //current temperature value inside soldering station
 const int THRESHOLD_TEMP = 15;         //when heating temperature decrease by that value, heat will start again
+
+Solder* solder = new Solder(HEAT_PIN, 20);
 
 enum HeatStatus
 {
@@ -44,15 +46,19 @@ void setup()
   Serial.begin(9600); 
 }
 
-void loop() 
+void loop()
 {
-  uint8_t power = 25;
-  if(solder->lowFreqPwm(power)) //TODO check response of MAX 225ms but you call 20ms before 
+  uint8_t power = 50;
+  if(solder->lowFreqPwm(power)) //TODO check response of MAX 225ms but you call 20ms before
   {
     getActualIronTemperature();
     getActualSelectedTemperature();
   }
-
+  if(solder->isHeating())
+    heatIndicator->showBright(LED_RED);
+  else
+    heatIndicator->showBright(LED_GREEN);
+    
 
   if(serialResponse->timer())
     dataOutput();

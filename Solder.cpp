@@ -46,6 +46,6 @@ uint8_t Solder::getLevelFromPercentage(const uint8_t percentage) const
     level = 100;
   else
     level = percentage;
-  return (level * 2) + mLowPowerLevel;
+  return (level * 2.55);
 }
 
