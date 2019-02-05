@@ -7,7 +7,25 @@ void Solder::heatIron(const bool onOff)
   {
     mHeatStatus = onOff;
     digitalWrite(mHeatPin, onOff);
-    //powerModes->bookHeating(onOff);
+  }
+}
+
+void Solder::runtime()
+{
+  if(lowFreqPwm(mPower))
+  {
+    getIronTemperature();
+    getSelectedTemperature();
+
+    if(mSelectedTemp > mIronTemp)
+      ++mPower;
+    else
+      --mPower;
+
+    if(51 == mPower)
+      mPower = 50;
+    else if(mPower == 0)
+    mPower = 0;
   }
 }
 
@@ -36,6 +54,7 @@ bool Solder::lowFreqPwm(const unsigned int level)
       return false;
     }
   }
+  return false;
 }
 
 bool Solder::isHeating() const
@@ -53,5 +72,23 @@ uint8_t Solder::getLevelFromPercentage(const uint8_t percentage) const
   else
     level = percentage;
   return (level);
+}
+
+int Solder::getIronTemperature()
+{
+  mIronTemp = mThermocouple.readCelsius() - 300;
+  return mIronTemp; // todopass by reference 8bit 
+}
+
+int Solder::getSelectedTemperature()
+{
+  mSelectedTemp = (0.195503 * analogRead(mSelectPin)) + 200 + 100; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  return mSelectedTemp; // todopass by reference 8bit 
+}
+
+uint8_t Solder::getPower() const
+{
+
+  return mPower;
 }
 
