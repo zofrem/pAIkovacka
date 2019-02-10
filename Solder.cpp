@@ -22,39 +22,35 @@ void Solder::runtime()
     else
       --mPower;
 
-    if(51 == mPower)
-      mPower = 50;
+    if(mMaxPower < mPower)
+      mPower = mMaxPower;
     else if(mPower == 0)
     mPower = 0;
   }
 }
 
 bool Solder::lowFreqPwm(const unsigned int level)
-{        
+{
+  bool measure = false;
   if(mPwmTimer->timer())
   {
     ++mCyclus;
-    if(101 == mCyclus)
+    bool heat = false;
+    if(PERCENTAGE_100 < mCyclus)
     {
       mCyclus = 0;
     }
     if(mCyclus <= getLevelFromPercentage(level))
     {
-      heatIron(true);
-      return false;
+      heat = true;
     }
-    else if(75 == mCyclus) // last moment before heating numeric_limits<uint8_t>::max() not for 8bit
+    else if(87 == mCyclus) //with 20ms is arround 1.75s
     {
-      heatIron(false);
-      return true; //now measure temperature
+      measure = true;      //now measure temperature
     }
-    else
-    {
-      heatIron(false);
-      return false;
-    }
+    heatIron(heat);
   }
-  return false;
+  return measure;
 }
 
 bool Solder::isHeating() const
@@ -65,8 +61,8 @@ bool Solder::isHeating() const
 uint8_t Solder::getLevelFromPercentage(const uint8_t percentage) const
 {
   uint8_t level = 0;
-  if(100 < percentage)
-    level = 100;
+  if(PERCENTAGE_100 < percentage)
+    level = PERCENTAGE_100;
   else if(mMaxPower <= percentage)
     level = mMaxPower;
   else
@@ -77,18 +73,17 @@ uint8_t Solder::getLevelFromPercentage(const uint8_t percentage) const
 int Solder::getIronTemperature()
 {
   mIronTemp = mThermocouple.readCelsius() - 300;
-  return mIronTemp; // todopass by reference 8bit 
+  return mIronTemp; //TODO pass by reference 8bit only
 }
 
 int Solder::getSelectedTemperature()
 {
-  mSelectedTemp = (0.195503 * analogRead(mSelectPin)) + 200 + 100; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
-  return mSelectedTemp; // todopass by reference 8bit 
+  mSelectedTemp = (0.195503 * analogRead(mSelectPin)) + 200; // linear conversion for potentiometer from 0-1023 analog read to 200-400 degrees of celsius
+  return mSelectedTemp; //TODO pass by reference 8bit only
 }
 
 uint8_t Solder::getPower() const
 {
-
   return mPower;
 }
 

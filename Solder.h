@@ -13,14 +13,15 @@
 
 class Solder {
   public:
-    Solder(const uint8_t heatPin, const uint8_t selectPin, MAX6675& max6675, const uint32_t time = 20) : mHeatPin(heatPin), mSelectPin(selectPin), mThermocouple(max6675), mTime(time), mMaxPower(50), mPower(20) 
+    Solder(const uint8_t heatPin, const uint8_t selectPin, MAX6675& max6675, const uint32_t time = 20) : PERCENTAGE_100(100), mHeatPin(heatPin), mSelectPin(selectPin), mThermocouple(max6675), mTime(time), mMaxPower(65)
     {
-        pinMode(mHeatPin, OUTPUT);           //inicialization pin discrete heating for behavior like output
+        pinMode(mHeatPin, OUTPUT);
         mPwmTimer = new LoopTimer(mTime);
         mCyclus = 0;
         mHeatStatus = false;
-        
+        mPower = mMaxPower; //TODO when power is reset possible overheat
     };
+
     void runtime(); 
     bool lowFreqPwm(const unsigned int level);
     bool isHeating() const;
@@ -28,6 +29,7 @@ class Solder {
     int getSelectedTemperature();
     uint8_t getPower() const;
 
+    const uint8_t PERCENTAGE_100;
   
   private:
     Solder(const Solder& notPaste);
