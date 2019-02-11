@@ -22,10 +22,11 @@ void Solder::runtime()
     else
       --mPower;
 
-    if(mMaxPower < mPower)
+    if(mPower == 0xFF)
+      mPower = 0;
+    else if(mMaxPower < mPower)
       mPower = mMaxPower;
-    else if(mPower == 0)
-    mPower = 0;
+
   }
 }
 
