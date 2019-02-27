@@ -73,7 +73,7 @@ uint8_t Solder::getLevelFromPercentage(const uint8_t percentage) const
 
 int Solder::getIronTemperature()
 {
-  mIronTemp = mThermocouple.readCelsius() - 300;
+  mIronTemp = mThermocouple.readCelsius();
   return mIronTemp; //TODO pass by reference 8bit only
 }
 
